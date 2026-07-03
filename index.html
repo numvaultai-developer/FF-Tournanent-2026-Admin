@@ -1,0 +1,1375 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>👑 Admin Panel - Tournament App</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background: #0a0e17;
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0 20px;
+            border-bottom: 1px solid #1e2a3a;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .admin-header h1 {
+            font-size: 24px;
+            background: linear-gradient(135deg, #f7971e, #ffd200);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .admin-header .badge-admin {
+            background: #f7971e;
+            color: #000;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+        .admin-header .refresh-btn {
+            background: #1e2a3a;
+            border: none;
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .admin-header .refresh-btn:hover {
+            background: #2a3a4a;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 14px;
+            margin: 20px 0;
+        }
+        .stat-card {
+            background: #141b2b;
+            padding: 18px;
+            border-radius: 14px;
+            border: 1px solid #1e2a3a;
+            text-align: center;
+        }
+        .stat-card .num {
+            font-size: 28px;
+            font-weight: 700;
+        }
+        .stat-card .num.gold {
+            color: #ffd700;
+        }
+        .stat-card .num.green {
+            color: #4caf50;
+        }
+        .stat-card .num.red {
+            color: #dc3545;
+        }
+        .stat-card .num.blue {
+            color: #4fc3f7;
+        }
+        .stat-card .lbl {
+            font-size: 12px;
+            color: #8899aa;
+            margin-top: 4px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 6px;
+            background: #141b2b;
+            padding: 6px;
+            border-radius: 14px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        .tabs button {
+            flex: 1;
+            padding: 10px 12px;
+            border: none;
+            background: transparent;
+            color: #8899aa;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 12px;
+            cursor: pointer;
+            transition: 0.3s;
+            min-width: 80px;
+        }
+        .tabs button.active {
+            background: #f7971e;
+            color: #fff;
+        }
+        .tabs button:hover:not(.active) {
+            color: #fff;
+        }
+
+        .section {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        .section.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card {
+            background: #141b2b;
+            border-radius: 14px;
+            padding: 18px;
+            margin-bottom: 14px;
+            border: 1px solid #1e2a3a;
+        }
+        .card .card-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .card .card-title .action-btn {
+            background: #f7971e;
+            border: none;
+            color: #000;
+            padding: 4px 14px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        .card .card-title .action-btn:hover {
+            background: #e08a0b;
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            color: #8899aa;
+            margin-bottom: 4px;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: 10px;
+            border: 1px solid #1e2a3a;
+            background: #0a0e17;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+            transition: 0.3s;
+        }
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: #f7971e;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .btn-primary {
+            background: #f7971e;
+            color: #000;
+        }
+        .btn-primary:hover {
+            background: #e08a0b;
+        }
+        .btn-success {
+            background: #4caf50;
+            color: #fff;
+        }
+        .btn-success:hover {
+            background: #388e3c;
+        }
+        .btn-danger {
+            background: #dc3545;
+            color: #fff;
+        }
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        .btn-warning {
+            background: #ffc107;
+            color: #000;
+        }
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+        .btn-secondary {
+            background: #1e2a3a;
+            color: #fff;
+        }
+        .btn-secondary:hover {
+            background: #2a3a4a;
+        }
+        .btn-sm {
+            padding: 6px 14px;
+            font-size: 12px;
+        }
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+
+        .list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #1a1a2a;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .list-item .info {
+            flex: 1;
+            min-width: 150px;
+        }
+        .list-item .info .name {
+            font-weight: 600;
+        }
+        .list-item .info .sub {
+            font-size: 12px;
+            color: #8899aa;
+        }
+        .list-item .actions {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .badge-status {
+            padding: 2px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .badge-status.pending {
+            background: #ffc107;
+            color: #000;
+        }
+        .badge-status.approved {
+            background: #4caf50;
+            color: #fff;
+        }
+        .badge-status.rejected {
+            background: #dc3545;
+            color: #fff;
+        }
+        .badge-status.completed {
+            background: #4caf50;
+            color: #fff;
+        }
+        .badge-status.waiting {
+            background: #ffc107;
+            color: #000;
+        }
+        .badge-status.ongoing {
+            background: #4caf50;
+            color: #fff;
+        }
+        .badge-status.banned {
+            background: #dc3545;
+            color: #fff;
+        }
+        .badge-status.active {
+            background: #4caf50;
+            color: #fff;
+        }
+
+        .screenshot-thumb {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid #1e2a3a;
+            cursor: pointer;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .modal-overlay.open {
+            display: flex;
+        }
+        .modal {
+            background: #141b2b;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 480px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 1px solid #1e2a3a;
+        }
+        .modal h3 {
+            font-size: 22px;
+            margin-bottom: 6px;
+        }
+        .modal .sub {
+            color: #8899aa;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+        .modal .qr-container {
+            text-align: center;
+            margin: 10px 0 20px;
+        }
+        .modal .qr-container img {
+            width: 160px;
+            height: 160px;
+            border-radius: 12px;
+            border: 2px solid #1e2a3a;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #141b2b;
+            padding: 14px 28px;
+            border-radius: 12px;
+            border: 1px solid #1e2a3a;
+            font-weight: 600;
+            z-index: 2000;
+            display: none;
+            max-width: 90%;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+        }
+        .toast.show {
+            display: block;
+            animation: slideUp 0.4s ease;
+        }
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+        .toast.success {
+            border-color: #4caf50;
+        }
+        .toast.error {
+            border-color: #dc3545;
+        }
+        .toast.info {
+            border-color: #f7971e;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 30px 20px;
+            color: #8899aa;
+        }
+        .empty i {
+            font-size: 40px;
+            margin-bottom: 10px;
+            opacity: 0.4;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0a0e17;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e2a3a;
+            border-radius: 10px;
+        }
+
+        @media (max-width: 600px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .admin-header h1 {
+                font-size: 18px;
+            }
+            .tabs button {
+                font-size: 11px;
+                padding: 8px 10px;
+                min-width: 60px;
+            }
+            .modal {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="toast" class="toast"></div>
+
+    <!-- HEADER -->
+    <div class="admin-header">
+        <div>
+            <h1>👑 Admin Panel</h1>
+            <span class="badge-admin">🔐 Admin Access</span>
+        </div>
+        <button class="refresh-btn" onclick="refreshAll()"><i class="fas fa-sync"></i> Refresh</button>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-grid" id="statsGrid">
+        <div class="stat-card"><div class="num gold" id="statUsers">0</div><div class="lbl">Total Users</div></div>
+        <div class="stat-card"><div class="num blue" id="statMatches">0</div><div class="lbl">Total Matches</div></div>
+        <div class="stat-card"><div class="num gold" id="statRevenue">₹0</div><div class="lbl">Total Revenue</div></div>
+        <div class="stat-card"><div class="num red" id="statPendingWD">0</div><div class="lbl">Pending Withdrawals</div></div>
+        <div class="stat-card"><div class="num blue" id="statPendingFund">0</div><div class="lbl">Pending Fund Requests</div></div>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs">
+        <button class="active" data-tab="dashboard"><i class="fas fa-home"></i> Dashboard</button>
+        <button data-tab="matches"><i class="fas fa-gamepad"></i> Matches</button>
+        <button data-tab="funds"><i class="fas fa-coins"></i> Fund Requests</button>
+        <button data-tab="withdrawals"><i class="fas fa-arrow-up"></i> Withdrawals</button>
+        <button data-tab="users"><i class="fas fa-users"></i> Users</button>
+        <button data-tab="settings"><i class="fas fa-cog"></i> Settings</button>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div id="tab-dashboard" class="section active">
+        <div class="card">
+            <div class="card-title">📊 Recent Activity</div>
+            <div id="recentActivity"><div class="empty"><i class="fas fa-clock"></i><p>No recent activity</p></div></div>
+        </div>
+    </div>
+
+    <!-- MATCHES -->
+    <div id="tab-matches" class="section">
+        <div class="card">
+            <div class="card-title">🎮 Create Match <button class="action-btn" onclick="createMatch()"><i class="fas fa-plus"></i> Create</button></div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Match Type</label>
+                    <select id="matchType">
+                        <option value="1v1">1v1</option>
+                        <option value="2v2">2v2</option>
+                        <option value="3v3">3v3</option>
+                        <option value="Squad">Squad</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Entry Fee (₹)</label>
+                    <select id="matchEntryFee">
+                        <option value="10">₹10</option>
+                        <option value="20">₹20</option>
+                        <option value="50">₹50</option>
+                        <option value="100">₹100</option>
+                        <option value="200">₹200</option>
+                        <option value="500">₹500</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Commission (%)</label>
+                    <input type="number" id="matchCommission" value="10" min="0" max="50" />
+                </div>
+                <div class="form-group">
+                    <label>Map</label>
+                    <select id="matchMap">
+                        <option value="Bermuda">Bermuda</option>
+                        <option value="Kalahari">Kalahari</option>
+                        <option value="Purgatory">Purgatory</option>
+                        <option value="Nexus">Nexus</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Max Players</label>
+                    <input type="number" id="matchMaxPlayers" value="2" min="2" max="12" />
+                </div>
+                <div class="form-group">
+                    <label>Scheduled Time</label>
+                    <input type="datetime-local" id="matchScheduledTime" />
+                </div>
+            </div>
+            <div id="matchCreateStatus" style="margin-top:8px;font-size:13px;color:#8899aa;"></div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">🟢 Ongoing Matches</div>
+            <div id="ongoingMatches"><div class="empty"><i class="fas fa-gamepad"></i><p>No ongoing matches</p></div></div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">📋 All Matches</div>
+            <div id="allMatchesList"><div class="empty"><i class="fas fa-list"></i><p>No matches created</p></div></div>
+        </div>
+    </div>
+
+    <!-- FUND REQUESTS -->
+    <div id="tab-funds" class="section">
+        <div class="card">
+            <div class="card-title">💰 Fund Requests</div>
+            <div id="fundRequestsList"><div class="empty"><i class="fas fa-coins"></i><p>No fund requests</p></div></div>
+        </div>
+    </div>
+
+    <!-- WITHDRAWALS -->
+    <div id="tab-withdrawals" class="section">
+        <div class="card">
+            <div class="card-title">💸 Withdrawal Requests</div>
+            <div id="withdrawalsList"><div class="empty"><i class="fas fa-arrow-up"></i><p>No withdrawal requests</p></div></div>
+        </div>
+    </div>
+
+    <!-- USERS -->
+    <div id="tab-users" class="section">
+        <div class="card">
+            <div class="card-title">👥 All Users <span style="font-size:13px;color:#8899aa;font-weight:400;" id="userCountLabel">(0)</span></div>
+            <div class="form-group">
+                <input type="text" id="userSearch" placeholder="🔍 Search users by name or email..." oninput="filterUsers()" />
+            </div>
+            <div id="usersList"><div class="empty"><i class="fas fa-users"></i><p>No users found</p></div></div>
+        </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div id="tab-settings" class="section">
+        <div class="card">
+            <div class="card-title">⚙️ Admin Settings</div>
+            <div class="form-group">
+                <label>UPI ID</label>
+                <input type="text" id="settingUPI" value="uddin6@fam" />
+            </div>
+            <div class="form-group">
+                <label>QR Code URL</label>
+                <input type="text" id="settingQR" value="https://i.ibb.co/nqmpx1w0/IMG-20260508-153134-855.jpg" />
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Commission (%)</label>
+                    <input type="number" id="settingCommission" value="10" min="0" max="50" />
+                </div>
+                <div class="form-group">
+                    <label>Min Entry Fee</label>
+                    <input type="number" id="settingMinFee" value="10" />
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Max Entry Fee</label>
+                    <input type="number" id="settingMaxFee" value="1000" />
+                </div>
+                <div class="form-group">
+                    <label>Min Withdrawal</label>
+                    <input type="number" id="settingMinWD" value="50" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Max Withdrawal Per Day</label>
+                <input type="number" id="settingMaxWD" value="1000" />
+            </div>
+            <button class="btn btn-primary" onclick="saveSettings()"><i class="fas fa-save"></i> Save Settings</button>
+            <div id="settingsStatus" style="margin-top:10px;font-size:13px;color:#8899aa;"></div>
+        </div>
+    </div>
+
+    <!-- MODALS -->
+    <div id="matchDetailModal" class="modal-overlay">
+        <div class="modal">
+            <h3>🎮 Match Details</h3>
+            <div class="sub" id="matchDetailTitle">Match #123</div>
+            <div class="form-group">
+                <label>Room ID</label>
+                <input type="text" id="matchRoomID" placeholder="Enter Room ID" />
+            </div>
+            <div class="form-group">
+                <label>Room Password</label>
+                <input type="text" id="matchRoomPassword" placeholder="Enter Room Password" />
+            </div>
+            <div class="form-group">
+                <label>Declare Winner</label>
+                <select id="matchWinnerSelect">
+                    <option value="">Select Winner</option>
+                </select>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-secondary" onclick="closeModal('matchDetailModal')">Close</button>
+                <button class="btn btn-success" onclick="updateMatchRoom()"><i class="fas fa-key"></i> Set Room</button>
+                <button class="btn btn-primary" onclick="declareWinner()"><i class="fas fa-trophy"></i> Declare Winner</button>
+            </div>
+            <div id="matchDetailStatus" style="margin-top:10px;font-size:13px;color:#8899aa;"></div>
+        </div>
+    </div>
+
+    <div id="screenshotModal" class="modal-overlay">
+        <div class="modal" style="max-width:400px;">
+            <h3>📸 Screenshot</h3>
+            <div style="text-align:center;margin:15px 0;">
+                <img id="screenshotPreview" src="" alt="Screenshot" style="max-width:100%;border-radius:10px;border:1px solid #1e2a3a;" />
+            </div>
+            <button class="btn btn-secondary" onclick="closeModal('screenshotModal')">Close</button>
+        </div>
+    </div>
+
+    <!-- FIREBASE -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js">
+    </script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js">
+    </script>
+
+    <script>
+        // ============================================================
+        // 🔥 FIREBASE CONFIG
+        // ============================================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyCbGAslSsPxjUsP5CW68oT2HBXbqewXXr4",
+            authDomain: "tournamentapp-5d08c.firebaseapp.com",
+            databaseURL: "https://tournamentapp-5d08c-default-rtdb.firebaseio.com",
+            projectId: "tournamentapp-5d08c",
+            storageBucket: "tournamentapp-5d08c.firebasestorage.app",
+            messagingSenderId: "271774941948",
+            appId: "1:271774941948:web:8e4644dca78472fbf78d79"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // ============================================================
+        // 🔥 AUTO DATABASE SETUP - Admin Panel Open Karte Hi Data Create Ho Jata Hai
+        // ============================================================
+        function autoSetupDatabase() {
+            db.ref('adminSettings').once('value').then(snap => {
+                if (!snap.exists()) {
+                    console.log('🔄 Admin Panel: Database empty, auto-creating structure...');
+
+                    const setupData = {
+                        adminSettings: {
+                            upiID: "uddin6@fam",
+                            qrCodeURL: "https://i.ibb.co/nqmpx1w0/IMG-20260508-153134-855.jpg",
+                            commissionPercentage: 10,
+                            minEntryFee: 10,
+                            maxEntryFee: 1000,
+                            minWithdrawal: 50,
+                            maxWithdrawalPerDay: 1000,
+                            maintenanceMode: false,
+                            announcements: []
+                        },
+                        users: {},
+                        matches: {},
+                        transactions: {},
+                        withdrawals: {},
+                        reports: {}
+                    };
+
+                    db.ref().set(setupData).then(() => {
+                        console.log('✅ Admin Panel: Database structure created automatically!');
+                        refreshAll();
+                    }).catch(err => {
+                        console.error('❌ Auto setup error:', err);
+                    });
+                } else {
+                    console.log('✅ Admin Panel: Database already exists.');
+                    refreshAll();
+                }
+            }).catch(err => {
+                console.error('❌ Error checking database:', err);
+            });
+        }
+
+        // ============================================================
+        // GLOBAL STATE
+        // ============================================================
+        let allUsers = {};
+        let allMatches = {};
+        let allTransactions = {};
+        let allWithdrawals = {};
+        let allSettings = {};
+        let selectedMatchId = null;
+
+        // ============================================================
+        // TOAST
+        // ============================================================
+        function showToast(msg, type = 'info') {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.className = 'toast ' + type + ' show';
+            clearTimeout(t._timer);
+            t._timer = setTimeout(() => t.classList.remove('show'), 3000);
+        }
+
+        // ============================================================
+        // MODAL HELPERS
+        // ============================================================
+        function openModal(id) { document.getElementById(id).classList.add('open'); }
+
+        function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+        // ============================================================
+        // REFRESH ALL
+        // ============================================================
+        function refreshAll() {
+            loadUsers();
+            loadMatches();
+            loadTransactions();
+            loadWithdrawals();
+            loadSettings();
+            showToast('Refreshed!', 'success');
+        }
+
+        // ============================================================
+        // TABS
+        // ============================================================
+        document.querySelectorAll('.tabs button').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.tabs button').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                const tab = this.dataset.tab;
+                document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+                document.getElementById('tab-' + tab).classList.add('active');
+
+                if (tab === 'dashboard') updateDashboard();
+                if (tab === 'matches') loadMatches();
+                if (tab === 'funds') loadFundRequests();
+                if (tab === 'withdrawals') loadWithdrawals();
+                if (tab === 'users') loadUsers();
+                if (tab === 'settings') loadSettings();
+            });
+        });
+
+        // ============================================================
+        // LOAD USERS
+        // ============================================================
+        function loadUsers() {
+            db.ref('users').on('value', snap => {
+                allUsers = snap.val() || {};
+                document.getElementById('statUsers').textContent = Object.keys(allUsers).length;
+                document.getElementById('userCountLabel').textContent = '(' + Object.keys(allUsers).length + ')';
+                renderUsers();
+                updateDashboard();
+            });
+        }
+
+        function renderUsers() {
+            const container = document.getElementById('usersList');
+            const search = (document.getElementById('userSearch')?.value || '').toLowerCase();
+            const keys = Object.keys(allUsers);
+
+            if (keys.length === 0) {
+                container.innerHTML = `<div class="empty"><i class="fas fa-users"></i><p>No users</p></div>`;
+                return;
+            }
+
+            let html = '';
+            keys.forEach(key => {
+                const u = allUsers[key];
+                const name = (u.name || '').toLowerCase();
+                const email = (u.email || '').toLowerCase();
+                if (search && !name.includes(search) && !email.includes(search)) return;
+
+                const statusClass = u.isBanned ? 'banned' : 'active';
+                const statusText = u.isBanned ? '🚫 Banned' : '✅ Active';
+
+                html += `
+                    <div class="list-item">
+                        <div class="info">
+                            <div class="name">${u.name || 'Unknown'} <span class="badge-status ${statusClass}">${statusText}</span></div>
+                            <div class="sub">${u.email || ''} | Balance: ₹${u.walletBalance || 0} | Matches: ${u.totalMatches || 0}</div>
+                        </div>
+                        <div class="actions">
+                            <button class="btn ${u.isBanned ? 'btn-success' : 'btn-danger'} btn-sm" onclick="toggleBan('${key}')">
+                                ${u.isBanned ? 'Unban' : 'Ban'}
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html || `<div class="empty"><i class="fas fa-search"></i><p>No users match</p></div>`;
+        }
+
+        function filterUsers() { renderUsers(); }
+
+        // ============================================================
+        // TOGGLE BAN
+        // ============================================================
+        function toggleBan(uid) {
+            const user = allUsers[uid];
+            if (!user) return;
+            const newStatus = !user.isBanned;
+            db.ref('users/' + uid + '/isBanned').set(newStatus)
+                .then(() => {
+                    showToast(newStatus ? 'User banned' : 'User unbanned', 'success');
+                })
+                .catch(err => showToast('Error: ' + err.message, 'error'));
+        }
+
+        // ============================================================
+        // LOAD MATCHES
+        // ============================================================
+        function loadMatches() {
+            db.ref('matches').on('value', snap => {
+                allMatches = snap.val() || {};
+                document.getElementById('statMatches').textContent = Object.keys(allMatches).length;
+                renderAllMatches();
+                renderOngoingMatches();
+                updateDashboard();
+            });
+        }
+
+        function renderAllMatches() {
+            const container = document.getElementById('allMatchesList');
+            const keys = Object.keys(allMatches);
+
+            if (keys.length === 0) {
+                container.innerHTML = `<div class="empty"><i class="fas fa-list"></i><p>No matches created</p></div>`;
+                return;
+            }
+
+            let html = '';
+            keys.reverse().forEach(key => {
+                const m = allMatches[key];
+                const statusClass = m.status || 'waiting';
+                html += `
+                    <div class="list-item">
+                        <div class="info">
+                            <div class="name">${m.matchType || 'Match'} <span class="badge-status ${statusClass}">${statusClass}</span></div>
+                            <div class="sub">Fee: ₹${m.entryFee} | Prize: ₹${m.prizePool} | ${m.currentPlayers || 0}/${m.maxPlayers} players</div>
+                        </div>
+                        <div class="actions">
+                            <button class="btn btn-primary btn-sm" onclick="openMatchDetail('${key}')"><i class="fas fa-edit"></i> Manage</button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function renderOngoingMatches() {
+            const container = document.getElementById('ongoingMatches');
+            const keys = Object.keys(allMatches).filter(k => allMatches[k].status === 'ongoing');
+
+            if (keys.length === 0) {
+                container.innerHTML = `<div class="empty"><i class="fas fa-gamepad"></i><p>No ongoing matches</p></div>`;
+                return;
+            }
+
+            let html = '';
+            keys.forEach(key => {
+                const m = allMatches[key];
+                html += `
+                    <div class="list-item">
+                        <div class="info">
+                            <div class="name">${m.matchType || 'Match'} 🟢 Ongoing</div>
+                            <div class="sub">${m.currentPlayers || 0}/${m.maxPlayers} players | Room: ${m.roomID || 'Not set'}</div>
+                        </div>
+                        <div class="actions">
+                            <button class="btn btn-primary btn-sm" onclick="openMatchDetail('${key}')"><i class="fas fa-edit"></i> Manage</button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        // ============================================================
+        // CREATE MATCH
+        // ============================================================
+        function createMatch() {
+            const type = document.getElementById('matchType').value;
+            const entryFee = parseInt(document.getElementById('matchEntryFee').value);
+            const commission = parseInt(document.getElementById('matchCommission').value) || 10;
+            const map = document.getElementById('matchMap').value;
+            const maxPlayers = parseInt(document.getElementById('matchMaxPlayers').value) || 2;
+            const scheduledTime = document.getElementById('matchScheduledTime').value;
+
+            const prizePool = entryFee - (entryFee * commission / 100);
+
+            const matchData = {
+                matchType: type,
+                entryFee: entryFee,
+                commission: commission,
+                prizePool: prizePool,
+                map: map,
+                maxPlayers: maxPlayers,
+                currentPlayers: 0,
+                status: 'waiting',
+                createdBy: 'admin',
+                createdAt: Date.now(),
+                scheduledTime: scheduledTime ? new Date(scheduledTime).getTime() : null,
+                roomID: '',
+                roomPassword: '',
+                winner: '',
+                players: {},
+                result: {}
+            };
+
+            db.ref('matches').push(matchData)
+                .then(() => {
+                    showToast('Match created successfully!', 'success');
+                    document.getElementById('matchCreateStatus').textContent = '✅ Match created!';
+                    loadMatches();
+                })
+                .catch(err => {
+                    showToast('Error: ' + err.message, 'error');
+                    document.getElementById('matchCreateStatus').textContent = '❌ Error: ' + err.message;
+                });
+        }
+
+        // ============================================================
+        // OPEN MATCH DETAIL
+        // ============================================================
+        function openMatchDetail(matchId) {
+            selectedMatchId = matchId;
+            const m = allMatches[matchId];
+            if (!m) return;
+
+            document.getElementById('matchDetailTitle').textContent = `${m.matchType} | ₹${m.entryFee} entry | Status: ${m.status}`;
+            document.getElementById('matchRoomID').value = m.roomID || '';
+            document.getElementById('matchRoomPassword').value = m.roomPassword || '';
+            document.getElementById('matchDetailStatus').textContent = '';
+
+            const select = document.getElementById('matchWinnerSelect');
+            select.innerHTML = '<option value="">Select Winner</option>';
+            if (m.players) {
+                Object.keys(m.players).forEach(uid => {
+                    const p = m.players[uid];
+                    const name = p.name || uid;
+                    select.innerHTML += `<option value="${uid}">${name}</option>`;
+                });
+            }
+
+            openModal('matchDetailModal');
+        }
+
+        // ============================================================
+        // UPDATE MATCH ROOM
+        // ============================================================
+        function updateMatchRoom() {
+            if (!selectedMatchId) return;
+            const roomID = document.getElementById('matchRoomID').value.trim();
+            const roomPassword = document.getElementById('matchRoomPassword').value.trim();
+
+            if (!roomID) {
+                showToast('Please enter Room ID', 'error');
+                return;
+            }
+
+            const updates = {
+                'matches/' + selectedMatchId + '/roomID': roomID,
+                'matches/' + selectedMatchId + '/roomPassword': roomPassword,
+                'matches/' + selectedMatchId + '/status': 'ongoing'
+            };
+
+            db.ref().update(updates)
+                .then(() => {
+                    showToast('Room set & match started!', 'success');
+                    document.getElementById('matchDetailStatus').textContent = '✅ Room set! Match is now ongoing.';
+                    loadMatches();
+                })
+                .catch(err => {
+                    showToast('Error: ' + err.message, 'error');
+                });
+        }
+
+        // ============================================================
+        // DECLARE WINNER
+        // ============================================================
+        function declareWinner() {
+            if (!selectedMatchId) return;
+            const winnerUID = document.getElementById('matchWinnerSelect').value;
+
+            if (!winnerUID) {
+                showToast('Please select a winner', 'error');
+                return;
+            }
+
+            const m = allMatches[selectedMatchId];
+            if (!m) return;
+
+            const players = m.players || {};
+            const loserUIDs = Object.keys(players).filter(uid => uid !== winnerUID);
+            const prizePool = m.prizePool || (m.entryFee - (m.entryFee * (m.commission || 10) / 100));
+
+            const updates = {};
+            updates['matches/' + selectedMatchId + '/winner'] = winnerUID;
+            updates['matches/' + selectedMatchId + '/status'] = 'completed';
+            updates['matches/' + selectedMatchId + '/result'] = {
+                winner: winnerUID,
+                losers: loserUIDs,
+                completedAt: Date.now()
+            };
+
+            // Winner gets prize
+            const winnerRef = db.ref('users/' + winnerUID);
+            winnerRef.once('value').then(snap => {
+                const winnerData = snap.val() || {};
+                const currentBalance = winnerData.walletBalance || 0;
+                const currentWins = winnerData.wins || 0;
+                const currentEarnings = winnerData.totalEarnings || 0;
+
+                updates['users/' + winnerUID + '/walletBalance'] = currentBalance + prizePool;
+                updates['users/' + winnerUID + '/wins'] = currentWins + 1;
+                updates['users/' + winnerUID + '/totalEarnings'] = currentEarnings + prizePool;
+
+                loserUIDs.forEach(uid => {
+                    updates['users/' + uid + '/losses'] = (allUsers[uid]?.losses || 0) + 1;
+                });
+
+                const txnRef = db.ref('transactions').push();
+                updates[txnRef.toString()] = {
+                    userId: winnerUID,
+                    type: 'winnings',
+                    amount: prizePool,
+                    matchId: selectedMatchId,
+                    status: 'completed',
+                    createdAt: Date.now()
+                };
+
+                loserUIDs.forEach(uid => {
+                    const txnRef2 = db.ref('transactions').push();
+                    updates[txnRef2.toString()] = {
+                        userId: uid,
+                        type: 'match_fee',
+                        amount: m.entryFee,
+                        matchId: selectedMatchId,
+                        status: 'completed',
+                        createdAt: Date.now()
+                    };
+                });
+
+                return db.ref().update(updates);
+            }).then(() => {
+                showToast(`🏆 Winner declared! Prize: ₹${prizePool}`, 'success');
+                document.getElementById('matchDetailStatus').textContent = `✅ Winner declared! ₹${prizePool} credited.`;
+                loadMatches();
+                loadUsers();
+                closeModal('matchDetailModal');
+            }).catch(err => {
+                showToast('Error: ' + err.message, 'error');
+            });
+        }
+
+        // ============================================================
+        // LOAD TRANSACTIONS (Fund Requests)
+        // ============================================================
+        function loadTransactions() {
+            db.ref('transactions').on('value', snap => {
+                allTransactions = snap.val() || {};
+                loadFundRequests();
+                updateDashboard();
+            });
+        }
+
+        function loadFundRequests() {
+            const container = document.getElementById('fundRequestsList');
+            const keys = Object.keys(allTransactions).filter(k => allTransactions[k].type === 'deposit');
+
+            if (keys.length === 0) {
+                container.innerHTML = `<div class="empty"><i class="fas fa-coins"></i><p>No fund requests</p></div>`;
+                return;
+            }
+
+            let html = '';
+            keys.reverse().forEach(key => {
+                const t = allTransactions[key];
+                const statusClass = t.status || 'pending';
+                const userName = allUsers[t.userId]?.name || t.userId || 'Unknown';
+
+                html += `
+                    <div class="list-item">
+                        <div class="info">
+                            <div class="name">${userName} <span class="badge-status ${statusClass}">${statusClass}</span></div>
+                            <div class="sub">Amount: ₹${t.amount} | UTR: ${t.utr || 'N/A'}</div>
+                        </div>
+                        <div class="actions">
+                            ${t.screenshot ? `<button class="btn btn-secondary btn-sm" onclick="viewScreenshot('${t.screenshot}')"><i class="fas fa-image"></i></button>` : ''}
+                            ${t.status === 'pending' ? `
+                                <button class="btn btn-success btn-sm" onclick="approveFund('${key}')">Approve</button>
+                                <button class="btn btn-danger btn-sm" onclick="rejectFund('${key}')">Reject</button>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+
+            const pending = keys.filter(k => allTransactions[k].status === 'pending');
+            document.getElementById('statPendingFund').textContent = pending.length;
+        }
+
+        // ============================================================
+        // APPROVE/REJECT FUND
+        // ============================================================
+        function approveFund(txnId) {
+            const txn = allTransactions[txnId];
+            if (!txn) return;
+
+            const userId = txn.userId;
+            const amount = txn.amount;
+
+            const updates = {};
+            updates['transactions/' + txnId + '/status'] = 'approved';
+            updates['transactions/' + txnId + '/processedAt'] = Date.now();
+
+            const user = allUsers[userId];
+            if (user) {
+                updates['users/' + userId + '/walletBalance'] = (user.walletBalance || 0) + amount;
+            }
+
+            db.ref().update(updates)
+                .then(() => {
+                    showToast('Fund request approved! ₹' + amount + ' added to wallet.', 'success');
+                    loadTransactions();
+                    loadUsers();
+                })
+                .catch(err => showToast('Error: ' + err.message, 'error'));
+        }
+
+        function rejectFund(txnId) {
+            const updates = {};
+            updates['transactions/' + txnId + '/status'] = 'rejected';
+            updates['transactions/' + txnId + '/processedAt'] = Date.now();
+
+            db.ref().update(updates)
+                .then(() => {
+                    showToast('Fund request rejected.', 'info');
+                    loadTransactions();
+                })
+                .catch(err => showToast('Error: ' + err.message, 'error'));
+        }
+
+        // ============================================================
+        // LOAD WITHDRAWALS
+        // ============================================================
+        function loadWithdrawals() {
+            db.ref('withdrawals').on('value', snap => {
+                allWithdrawals = snap.val() || {};
+                renderWithdrawals();
+                updateDashboard();
+            });
+        }
+
+        function renderWithdrawals() {
+            const container = document.getElementById('withdrawalsList');
+            const keys = Object.keys(allWithdrawals);
+
+            if (keys.length === 0) {
+                container.innerHTML = `<div class="empty"><i class="fas fa-arrow-up"></i><p>No withdrawal requests</p></div>`;
+                return;
+            }
+
+            let html = '';
+            keys.reverse().forEach(key => {
+                const w = allWithdrawals[key];
+                const statusClass = w.status || 'pending';
+                const userName = allUsers[w.userId]?.name || w.userId || 'Unknown';
+
+                html += `
+                    <div class="list-item">
+                        <div class="info">
+                            <div class="name">${userName} <span class="badge-status ${statusClass}">${statusClass}</span></div>
+                            <div class="sub">Amount: ₹${w.amount} | UPI: ${w.upiID || 'N/A'}</div>
+                        </div>
+                        <div class="actions">
+                            ${w.status === 'pending' ? `
+                                <button class="btn btn-success btn-sm" onclick="approveWithdrawal('${key}')">Approve</button>
+                                <button class="btn btn-danger btn-sm" onclick="rejectWithdrawal('${key}')">Reject</button>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+
+            const pending = keys.filter(k => allWithdrawals[k].status === 'pending');
+            document.getElementById('statPendingWD').textContent = pending.length;
+        }
+
+        // ============================================================
+        // APPROVE/REJECT WITHDRAWAL
+        // ============================================================
+        function approveWithdrawal(wdId) {
+            const wd = allWithdrawals[wdId];
+            if (!wd) return;
+
+            const updates = {};
+            updates['withdrawals/' + wdId + '/status'] = 'completed';
+            updates['withdrawals/' + wdId + '/processedAt'] = Date.now();
+
+            const userId = wd.userId;
+            const user = allUsers[userId];
+            if (user) {
+                const newBalance = (user.walletBalance || 0) - wd.amount;
+                if (newBalance < 0) {
+                    showToast('Insufficient balance!', 'error');
+                    return;
+                }
+                updates['users/' + userId + '/walletBalance'] = newBalance;
+            }
+
+            db.ref().update(updates)
+                .then(() => {
+                    showToast('Withdrawal approved!', 'success');
+                    loadWithdrawals();
+                    loadUsers();
+                })
+                .catch(err => showToast('Error: ' + err.message, 'error'));
+        }
+
+        function rejectWithdrawal(wdId) {
+            const updates = {};
+            updates['withdrawals/' + wdId + '/status'] = 'rejected';
+            updates['withdrawals/' + wdId + '/processedAt'] = Date.now();
+
+            db.ref().update(updates)
+                .then(() => {
+                    showToast('Withdrawal rejected.', 'info');
+                    loadWithdrawals();
+                })
+                .catch(err => showToast('Error: ' + err.message, 'error'));
+        }
+
+        // ============================================================
+        // VIEW SCREENSHOT
+        // ============================================================
+        function viewScreenshot(src) {
+            document.getElementById('screenshotPreview').src = src;
+            openModal('screenshotModal');
+        }
+
+        // ============================================================
+        // LOAD SETTINGS
+        // ============================================================
+        function loadSettings() {
+            db.ref('adminSettings').once('value', snap => {
+                const settings = snap.val() || {};
+                allSettings = settings;
+
+                document.getElementById('settingUPI').value = settings.upiID || 'uddin6@fam';
+                document.getElementById('settingQR').value = settings.qrCodeURL ||
+                    'https://i.ibb.co/nqmpx1w0/IMG-20260508-153134-855.jpg';
+                document.getElementById('settingCommission').value = settings.commissionPercentage || 10;
+                document.getElementById('settingMinFee').value = settings.minEntryFee || 10;
+                document.getElementById('settingMaxFee').value = settings.maxEntryFee || 1000;
+                document.getElementById('settingMinWD').value = settings.minWithdrawal || 50;
+                document.getElementById('settingMaxWD').value = settings.maxWithdrawalPerDay || 1000;
+            });
+        }
+
+        // ============================================================
+        // SAVE SETTINGS
+        // ============================================================
+        function saveSettings() {
+            const settings = {
+                upiID: document.getElementById('settingUPI').value.trim(),
+                qrCodeURL: document.getElementById('settingQR').value.trim(),
+                commissionPercentage: parseInt(document.getElementById('settingCommission').value) || 10,
+                minEntryFee: parseInt(document.getElementById('settingMinFee').value) || 10,
+                maxEntryFee: parseInt(document.getElementById('settingMaxFee').value) || 1000,
+                minWithdrawal: parseInt(document.getElementById('settingMinWD').value) || 50,
+                maxWithdrawalPerDay: parseInt(document.getElementById('settingMaxWD').value) || 1000,
+                maintenanceMode: allSettings.maintenanceMode || false,
+                announcements: allSettings.announcements || []
+            };
+
+            db.ref('adminSettings').update(settings)
+                .then(() => {
+                    showToast('Settings saved!', 'success');
+                    document.getElementById('settingsStatus').textContent = '✅ Settings updated successfully!';
+                    loadSettings();
+                })
+                .catch(err => {
+                    showToast('Error: ' + err.message, 'error');
+                    document.getElementById('settingsStatus').textContent = '❌ Error: ' + err.message;
+                });
+        }
+
+        // ============================================================
+        // UPDATE DASHBOARD
+        // ============================================================
+        function updateDashboard() {
+            let totalRevenue = 0;
+            Object.keys(allMatches).forEach(key => {
+                const m = allMatches[key];
+                if (m.status === 'completed') {
+                    totalRevenue += m.entryFee || 0;
+                }
+            });
+            document.getElementById('statRevenue').textContent = '₹' + totalRevenue;
+        }
+
+        // ============================================================
+        // 🔥 INIT - Auto Setup + Load Data
+        // ============================================================
+        autoSetupDatabase();
+
+        console.log('👑 Admin Panel Loaded!');
+        console.log('✅ Database auto-setup is active!');
+    </script>
+
+</body>
+</html>
